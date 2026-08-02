@@ -1717,6 +1717,27 @@ namespace winrt::TerminalApp::implementation
         }
 
         {
+            // "Pin tab"
+            Controls::FontIcon pinTabSymbol;
+            pinTabSymbol.FontFamily(Media::FontFamily{ L"Segoe Fluent Icons, Segoe MDL2 Assets" });
+            pinTabSymbol.Glyph(L"\xE718"); // Pin
+
+            _pinTabMenuItem.Click([weakThis](auto&&, auto&&) {
+                if (auto tab{ weakThis.get() })
+                {
+                    tab->Pin(!tab->Pinned());
+                }
+            });
+            _pinTabMenuItem.Text(RS_(L"PinTabText"));
+            _pinTabMenuItem.Icon(pinTabSymbol);
+
+            const auto pinTabToolTip = RS_(L"PinTabToolTip");
+
+            WUX::Controls::ToolTipService::SetToolTip(_pinTabMenuItem, box_value(pinTabToolTip));
+            Automation::AutomationProperties::SetHelpText(_pinTabMenuItem, pinTabToolTip);
+        }
+
+        {
             // "Duplicate tab"
             Controls::FontIcon duplicateTabSymbol;
             duplicateTabSymbol.FontFamily(Media::FontFamily{ L"Segoe Fluent Icons, Segoe MDL2 Assets" });
@@ -1817,6 +1838,7 @@ namespace winrt::TerminalApp::implementation
         Controls::MenuFlyoutSeparator menuSeparator;
         contextMenuFlyout.Items().Append(chooseColorMenuItem);
         contextMenuFlyout.Items().Append(renameTabMenuItem);
+        contextMenuFlyout.Items().Append(_pinTabMenuItem);
         contextMenuFlyout.Items().Append(_duplicateTabMenuItem);
         contextMenuFlyout.Items().Append(_splitTabMenuItem);
         _AppendMoveMenuItems(contextMenuFlyout);
@@ -1883,6 +1905,45 @@ namespace winrt::TerminalApp::implementation
         TabViewNumTabs(numTabs);
         _EnableMenuItems();
         _UpdateSwitchToTabKeyChord();
+    }
+
+    // Method Description:
+    // - Toggles whether this tab is "pinned". Pinned tabs are grouped to the
+    //   front of the tab strip (handled by TerminalPage) and are rendered
+    //   browser-style as an icon-only "chip".
+    // Arguments:
+    // - pinned: the new pinned state for this tab
+    void Tab::Pin(const bool pinned)
+    {
+        ASSERT_UI_THREAD();
+
+        if (_pinned == pinned)
+        {
+            return;
+        }
+
+        _pinned = pinned;
+        _UpdatePinnedState();
+
+        // Raise PropertyChanged so that TerminalPage can re-group pinned tabs to
+        // the front of the tab strip.
+        PropertyChanged.raise(*this, WUX::Data::PropertyChangedEventArgs{ L"Pinned" });
+    }
+
+    // Method Description:
+    // - Applies the visual treatment for the current pinned state and keeps the
+    //   context menu entry in sync ("Pin tab" <-> "Unpin tab").
+    void Tab::_UpdatePinnedState()
+    {
+        // Browser-style pinned tabs: collapse the header so only the tab's icon
+        // remains, shrinking the tab to an icon-only "chip".
+        _headerControl.Visibility(_pinned ? WUX::Visibility::Collapsed : WUX::Visibility::Visible);
+
+        _pinTabMenuItem.Text(_pinned ? RS_(L"UnpinTabText") : RS_(L"PinTabText"));
+        if (const auto icon{ _pinTabMenuItem.Icon().try_as<Controls::FontIcon>() })
+        {
+            icon.Glyph(_pinned ? L"\xE77A" : L"\xE718"); // Unpin : Pin
+        }
     }
 
     // Method Description:

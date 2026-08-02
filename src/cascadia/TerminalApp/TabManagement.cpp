@@ -116,6 +116,14 @@ namespace winrt::TerminalApp::implementation
             }
         }
 
+        // Newly created tabs are never pinned, so make sure they are inserted
+        // after any pinned tabs. Pinned tabs are always grouped at the front of
+        // the tab strip.
+        if (const auto pinnedCount = _PinnedTabCount(); insertPosition < pinnedCount)
+        {
+            insertPosition = pinnedCount;
+        }
+
         // Add the new tab to the list of our tabs.
         _tabs.InsertAt(insertPosition, *newTabImpl);
         _mruTabs.Append(*newTabImpl);
@@ -1179,6 +1187,69 @@ namespace winrt::TerminalApp::implementation
     }
 
     // Method Description:
+    // - Returns the number of pinned tabs currently in the tab strip. Because
+    //   pinned tabs are always grouped at the front, this is also the index of
+    //   the first unpinned tab.
+    uint32_t TerminalPage::_PinnedTabCount() const noexcept
+    {
+        uint32_t count = 0;
+        for (const auto& tab : _tabs)
+        {
+            if (tab.Pinned())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // Method Description:
+    // - Re-groups the tabs so that all pinned tabs come before all unpinned
+    //   tabs, preserving the relative order within each group (a stable
+    //   partition). This keeps both _tabs and the TabView's items in sync.
+    // - Called whenever a tab's pinned state changes, or after a drag/drop that
+    //   may have moved a tab across the pinned boundary.
+    void TerminalPage::_RepositionPinnedTabs()
+    {
+        const auto size = _tabs.Size();
+        if (size < 2)
+        {
+            return;
+        }
+
+        // Preserve the current selection across the reorder.
+        const auto selectedItem = _tabView.SelectedItem();
+
+        // Walk the list, moving each pinned tab forward to the current boundary.
+        // Unpinned tabs naturally shift right, so relative order is preserved
+        // within each group.
+        uint32_t boundary = 0;
+        for (uint32_t i = 0; i < size; ++i)
+        {
+            const auto tab = _tabs.GetAt(i);
+            if (tab.Pinned())
+            {
+                if (i != boundary)
+                {
+                    const auto tabViewItem = tab.TabViewItem();
+                    _tabs.RemoveAt(i);
+                    _tabs.InsertAt(boundary, tab);
+                    _tabView.TabItems().RemoveAt(i);
+                    _tabView.TabItems().InsertAt(boundary, tabViewItem);
+                }
+                boundary++;
+            }
+        }
+
+        _UpdateTabIndices();
+
+        if (selectedItem)
+        {
+            _tabView.SelectedItem(selectedItem);
+        }
+    }
+
+    // Method Description:
     // - Bumps the tab in its in-order index up to the top of the mru list.
     // Arguments:
     // - tab: tab to bump.
@@ -1228,6 +1299,10 @@ namespace winrt::TerminalApp::implementation
                                                 RS_fmt(L"TerminalPage_TabMovedAnnouncement_Direction", tabTitle, newTabIndex + 1),
                                                 L"TerminalPageMoveTabWithDirection" /* unique name for this notification category */);
             }
+
+            // Keep pinned tabs grouped at the front if this move crossed the
+            // pinned/unpinned boundary.
+            _RepositionPinnedTabs();
         }
     }
 
@@ -1269,6 +1344,10 @@ namespace winrt::TerminalApp::implementation
 
         from = std::nullopt;
         to = std::nullopt;
+
+        // If the tab was dragged across the pinned/unpinned boundary, snap it
+        // back into its group so pinned tabs stay grouped at the front.
+        _RepositionPinnedTabs();
     }
 
     void TerminalPage::_DismissTabContextMenus()

@@ -443,6 +443,7 @@
         "openWindowRenamer",
         "openWorkspace",
         "paste",
+        "pinTab",
         "prevTab",
         "quakeMode",
         "quit",

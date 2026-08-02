@@ -65,6 +65,9 @@ namespace winrt::TerminalApp::implementation
         void Shutdown();
         void ClosePane();
 
+        bool Pinned() const noexcept { return _pinned; }
+        void Pin(const bool pinned);
+
         void SetTabText(winrt::hstring title);
         winrt::hstring GetTabText() const;
         void ResetTabText();
@@ -142,6 +145,7 @@ namespace winrt::TerminalApp::implementation
 
         winrt::Windows::UI::Xaml::FocusState _focusState{ winrt::Windows::UI::Xaml::FocusState::Unfocused };
         winrt::Windows::UI::Xaml::Controls::MenuFlyoutItem _duplicateTabMenuItem{};
+        winrt::Windows::UI::Xaml::Controls::MenuFlyoutItem _pinTabMenuItem{};
         winrt::Windows::UI::Xaml::Controls::MenuFlyoutItem _splitTabMenuItem{};
         winrt::Windows::UI::Xaml::Controls::MenuFlyoutItem _moveToNewWindowMenuItem{};
         winrt::Windows::UI::Xaml::Controls::MenuFlyoutItem _moveRightMenuItem{};
@@ -205,6 +209,7 @@ namespace winrt::TerminalApp::implementation
         bool _receivedKeyDown{ false };
         bool _iconHidden{ false };
         bool _changingActivePane{ false };
+        bool _pinned{ false };
 
         winrt::hstring _runtimeTabText{};
         bool _inRename{ false };
@@ -218,6 +223,7 @@ namespace winrt::TerminalApp::implementation
         void _UpdateHeaderControlMaxWidth();
 
         void _CreateContextMenu();
+        void _UpdatePinnedState();
         winrt::hstring _CreateToolTipTitle();
 
         void _DetachEventHandlersFromContent(const uint32_t paneId);

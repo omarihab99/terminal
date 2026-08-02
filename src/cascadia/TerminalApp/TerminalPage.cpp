@@ -2113,6 +2113,10 @@ namespace winrt::TerminalApp::implementation
                 {
                     page->_UpdateTitle(*tab);
                 }
+                else if (propertyName == L"Pinned")
+                {
+                    page->_RepositionPinnedTabs();
+                }
                 else if (propertyName == L"Content")
                 {
                     if (*tab == page->_GetFocusedTab())

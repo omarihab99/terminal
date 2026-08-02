@@ -771,6 +771,9 @@
   <data name="CloseOtherTabs" xml:space="preserve">
     <value>Close other tabs</value>
   </data>
+  <data name="PinTab" xml:space="preserve">
+    <value>Pin tab</value>
+  </data>
   <data name="CloseTabsAfter" xml:space="preserve">
     <value>Close tabs after</value>
   </data>

@@ -30,6 +30,7 @@ static constexpr std::string_view OpenNewTabDropdownKey{ "openNewTabDropdown" };
 static constexpr std::string_view OpenSettingsKey{ "openSettings" };
 static constexpr std::string_view OpenTabColorPickerKey{ "openTabColorPicker" };
 static constexpr std::string_view PasteTextKey{ "paste" };
+static constexpr std::string_view PinTabKey{ "pinTab" };
 static constexpr std::string_view PrevTabKey{ "prevTab" };
 static constexpr std::string_view RenameTabKey{ "renameTab" };
 static constexpr std::string_view OpenTabRenamerKey{ "openTabRenamer" };

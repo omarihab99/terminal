@@ -294,6 +294,8 @@ namespace winrt::TerminalApp::implementation
         static winrt::com_ptr<Tab> _GetTabImpl(const TerminalApp::Tab& tab);
 
         void _UpdateTabIndices();
+        void _RepositionPinnedTabs();
+        uint32_t _PinnedTabCount() const noexcept;
 
         TerminalApp::Tab _settingsTab{ nullptr };
 

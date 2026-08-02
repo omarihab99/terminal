@@ -68,6 +68,16 @@ namespace winrt::TerminalApp::implementation
         args.Handled(true);
     }
 
+    void TerminalPage::_HandlePinTab(const IInspectable& /*sender*/,
+                                     const ActionEventArgs& args)
+    {
+        if (const auto activeTab{ _GetFocusedTabImpl() })
+        {
+            activeTab->Pin(!activeTab->Pinned());
+            args.Handled(true);
+        }
+    }
+
     void TerminalPage::_HandleCloseTab(const IInspectable& /*sender*/,
                                        const ActionEventArgs& args)
     {
@@ -799,6 +809,9 @@ namespace winrt::TerminalApp::implementation
                 std::copy(begin(_tabs) + index + 1, end(_tabs), std::back_inserter(tabsToRemove));
             }
 
+            // Pinned tabs are never affected by "close other tabs".
+            std::erase_if(tabsToRemove, [](const auto& t) { return t.Pinned(); });
+
             _RemoveTabs(tabsToRemove);
 
             actionArgs.Handled(!tabsToRemove.empty());
@@ -829,6 +842,10 @@ namespace winrt::TerminalApp::implementation
             // Since _RemoveTabs is asynchronous, create a snapshot of the  tabs we want to remove
             std::vector<winrt::TerminalApp::Tab> tabsToRemove;
             std::copy(begin(_tabs) + index + 1, end(_tabs), std::back_inserter(tabsToRemove));
+
+            // Pinned tabs are never affected by "close tabs after".
+            std::erase_if(tabsToRemove, [](const auto& t) { return t.Pinned(); });
+
             _RemoveTabs(tabsToRemove);
 
             // TODO:GH#7182 For whatever reason, if you run this action

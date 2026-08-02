@@ -249,6 +249,12 @@
   <data name="DuplicateTabText" xml:space="preserve">
     <value>Duplicate tab</value>
   </data>
+  <data name="PinTabText" xml:space="preserve">
+    <value>Pin tab</value>
+  </data>
+  <data name="UnpinTabText" xml:space="preserve">
+    <value>Unpin tab</value>
+  </data>
   <data name="InvalidMediaResource" xml:space="preserve">
     <value>One or more resources (such as icon or backgroundImage) specified in your settings could not be found.</value>
     <comment>{Locked="icon","backgroundImage"} Indicates that something has gone wrong while reading a user's settings.</comment>
@@ -872,6 +878,9 @@
   </data>
   <data name="DuplicateTabToolTip" xml:space="preserve">
     <value>Open a new tab using the active profile in the current directory</value>
+  </data>
+  <data name="PinTabToolTip" xml:space="preserve">
+    <value>Pin this tab to the front of the tab bar as an icon-only tab</value>
   </data>
   <data name="ExportTabToolTip" xml:space="preserve">
     <value>Export the contents of the text buffer into a text file</value>

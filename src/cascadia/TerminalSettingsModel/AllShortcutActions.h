@@ -73,6 +73,7 @@
     ON_ALL_ACTIONS(ToggleCommandPalette)    \
     ON_ALL_ACTIONS(CloseOtherTabs)          \
     ON_ALL_ACTIONS(CloseTabsAfter)          \
+    ON_ALL_ACTIONS(PinTab)                  \
     ON_ALL_ACTIONS(TabSearch)               \
     ON_ALL_ACTIONS(MoveTab)                 \
     ON_ALL_ACTIONS(BreakIntoDebugger)       \

@@ -34,6 +34,7 @@ namespace SettingsModelUnitTests
         TEST_METHOD(TestArbitraryArgs);
         TEST_METHOD(TestSplitPaneArgs);
         TEST_METHOD(TestStringOverload);
+        TEST_METHOD(TestPinTabAction);
         TEST_METHOD(TestSetTabColorArgs);
         TEST_METHOD(TestScrollArgs);
         TEST_METHOD(TestToggleCommandPaletteArgs);
@@ -537,6 +538,28 @@ namespace SettingsModelUnitTests
             const auto& realArgs = actionAndArgs.Args().as<CopyTextArgs>();
             // Verify the args have the expected value
             VERIFY_IS_FALSE(realArgs.SingleLine());
+        }
+    }
+
+    void KeyBindingsTests::TestPinTabAction()
+    {
+        const std::string bindings0String{ R"([
+            { "command": "pinTab", "id": "Test.PinTab", "keys": "ctrl+shift+i" }
+        ])" };
+
+        const auto bindings0Json = VerifyParseSucceeded(bindings0String);
+
+        auto actionMap = winrt::make_self<implementation::ActionMap>();
+        VERIFY_ARE_EQUAL(0u, actionMap->_KeyMap.size());
+        actionMap->LayerJson(bindings0Json, OriginTag::None);
+        VERIFY_ARE_EQUAL(1u, actionMap->_KeyMap.size());
+
+        {
+            KeyChord kc{ true, false, true, false, static_cast<int32_t>('I'), 0 };
+            auto actionAndArgs = ::TestUtils::GetActionAndArgs(*actionMap, kc);
+            // pinTab is an argument-less action.
+            VERIFY_ARE_EQUAL(ShortcutAction::PinTab, actionAndArgs.Action());
+            VERIFY_IS_NULL(actionAndArgs.Args());
         }
     }
 

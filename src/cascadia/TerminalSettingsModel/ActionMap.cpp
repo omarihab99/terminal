@@ -118,6 +118,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
                 { ShortcutAction::OpenWindowRenamer, USES_RESOURCE(L"OpenWindowRenamerCommandKey") },
                 { ShortcutAction::OpenWorkspace, USES_RESOURCE(L"OpenWorkspaceDefaultCommandKey") },
                 { ShortcutAction::PasteText, USES_RESOURCE(L"PasteTextCommandKey") },
+                { ShortcutAction::PinTab, USES_RESOURCE(L"PinTab") },
                 { ShortcutAction::PrevTab, USES_RESOURCE(L"PrevTabCommandKey") },
                 { ShortcutAction::QuickFix, USES_RESOURCE(L"QuickFixCommandKey") },
                 { ShortcutAction::QuakeMode, USES_RESOURCE(L"QuakeModeCommandKey") },
